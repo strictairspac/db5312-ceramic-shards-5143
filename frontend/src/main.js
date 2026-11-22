@@ -37,9 +37,9 @@ async function refresh() {
   const {key: page,id} = route();
   if (!pages[page]) { go('cases'); return; }
   try {
-    const result = await Promise.all([state.spec || api('/spec'),api('/cases'),api('/runs'),api('/evidence'),api('/audit')]);
+    const result = await Promise.all([state.spec || api('/spec'),api('/cases'),api('/runs'),api('/evidence'),api('/audit'),api('/bookings'),api('/bandwidths')]);
     if (revision !== key) return;
-    [state.spec,state.cases,state.runs,state.evidence,state.audit]=result;
+    [state.spec,state.cases,state.runs,state.evidence,state.audit,state.bookings,state.bandwidths]=result;
   } catch (error) {
     if (revision !== key) return;
     if (!document.getElementById('message')) app.innerHTML='<main><div id="message" role="alert"></div><button id="retry">重试</button></main>';
@@ -53,7 +53,7 @@ async function refresh() {
     <div class="workspace"><nav aria-label="业务模块">${navigation}</nav><main><div id="message" role="alert"></div>${pages[page](state,id)}</main></div>`;
   document.getElementById('logout').addEventListener('click',()=>{setSession(null); void refresh();});
   if (page==='editor') bindEditor(state, api, fail);
-  if (page==='evidence') bindEvidence(api, refresh, fail);
+  if (page==='evidence') bindEvidence(state, api, refresh, fail);
   if (page==='runs') {
     document.getElementById('refresh').addEventListener('click', refresh);
     if (state.runs.some(row=>['queued','running'].includes(row.status))) timer=setTimeout(refresh,1000);

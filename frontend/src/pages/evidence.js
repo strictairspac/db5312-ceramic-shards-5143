@@ -1,5 +1,6 @@
 import {heading, panel} from '../components/common/heading.js';
 import {entries, records} from '../components/common/records.js';
+import {bindBooking, bookingBlocks} from '../components/booking.js';
 import {topic} from '../constants/project.js';
 import {date, el, esc} from '../utils/dom.js';
 import {submit} from '../hooks/submit.js';
@@ -17,13 +18,14 @@ export function evidencePage(state, identity) {
   const history = state.evidence.map(row=>[`<a href="#evidence/${row.id}">执行 ${row.run_id}</a>`, esc(row.report.summary), esc(row.reviewer || '待复核')]);
   return `${heading(topic.modules[3], report.summary, `<button id="download" data-id="${current.id}">导出证据</button>`)}
     <div class="spread evidence-top"><dl class="metrics">${metrics}</dl><aside class="brief"><h2>复核签署</h2>${review}<details><summary>结果校验码</summary><code class="digest">${esc(current.digest)}</code></details></aside></div>
-    ${sections}<details><summary>历史证据</summary>${records(['执行','结论','复核'], history)}</details>`;
+    ${sections}${bookingBlocks(state, current)}<details><summary>历史证据</summary>${records(['执行','结论','复核'], history)}</details>`;
 }
 
-export function bindEvidence(api, update, fail) {
+export function bindEvidence(state, api, update, fail) {
   const button = document.getElementById('download');
   if (!button) return;
   const identity = button.dataset.id;
+  const current = state.evidence.find(row=>String(row.id)===String(identity));
   button.addEventListener('click', async()=>{
     try {
       const response = await api(`/evidence/${identity}/download`, {response:true});
@@ -39,4 +41,5 @@ export function bindEvidence(api, update, fail) {
     await api(`/evidence/${identity}/review`, {method:'POST', data:{note:data.get('note')}});
     await update();
   }, fail);
+  bindBooking(state, current, api, update, fail);
 }

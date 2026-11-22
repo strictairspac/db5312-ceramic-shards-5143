@@ -12,3 +12,8 @@ class Status(StrEnum):
     RUNNING = 'running'
     COMPLETE = 'complete'
     FAILED = 'failed'
+
+
+class BookingStatus(StrEnum):
+    BOOKED = 'booked'
+    CANCELLED = 'cancelled'

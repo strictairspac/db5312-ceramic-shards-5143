@@ -15,3 +15,13 @@ class CaseForm(BaseModel):
 
 class ReviewForm(BaseModel):
     note: str = Field(min_length=1, max_length=500)
+
+
+class BandwidthForm(BaseModel):
+    node_id: str = Field(min_length=1, max_length=64)
+    bandwidth_bytes_per_hour: int = Field(ge=0)
+
+
+class WindowForm(BaseModel):
+    start_at: str = Field(min_length=1, max_length=40)
+    end_at: str = Field(min_length=1, max_length=40)
